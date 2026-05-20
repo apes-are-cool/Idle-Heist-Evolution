@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Idle Heist Empire</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <div id="app">
+
+    <header class="topbar">
+      <h1>Idle Heist Empire</h1>
+      <div id="heat">Heat: 0</div>
+      <div id="cash">Cash: $0</div>
+    </header>
+
+    <main class="grid">
+
+      <!-- HQ PANEL -->
+      <section class="panel" id="hq">
+        <h2>HQ Control</h2>
+        <button id="upgrade-btn">Upgrade HQ (+$100 cost placeholder)</button>
+        <p id="hq-level">HQ Level: 1</p>
+      </section>
+
+      <!-- CREW PANEL -->
+      <section class="panel" id="crew">
+        <h2>Crew</h2>
+        <div id="crew-list"></div>
+      </section>
+
+      <!-- TARGET PANEL -->
+      <section class="panel" id="heist">
+        <h2>Heist Target</h2>
+
+        <div id="target-box">
+          <p><b>Target:</b> Convenience Store</p>
+          <p><b>Security:</b> 10</p>
+          <p><b>Reward:</b> $150</p>
+        </div>
+
+        <button id="run-heist">Run Heist</button>
+      </section>
+
+      <!-- LOG PANEL -->
+      <section class="panel" id="log">
+        <h2>Event Log</h2>
+        <div id="log-box"></div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
