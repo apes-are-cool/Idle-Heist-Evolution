@@ -5,51 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Idle Heist Empire</title>
   <link rel="stylesheet" href="style.css"/>
+  <script src="game.js" defer></script>
 </head>
 
 <body>
-  <div id="app">
+  <header class="topbar">
+    <h1>Idle Heist Empire</h1>
+    <div>
+      <span id="cash">Cash: $0</span>
+      <span id="heat">Heat: 0</span>
+    </div>
+  </header>
 
-    <header class="topbar">
-      <h1>Idle Heist Empire</h1>
-      <div id="stats">
-        <span id="cash">Cash: $0</span>
-        <span id="heat">Heat: 0</span>
+  <main class="grid">
+
+    <section class="panel">
+      <h2>HQ</h2>
+      <p id="hq-level">HQ Level: 1</p>
+      <button id="upgrade-hq">Upgrade HQ</button>
+    </section>
+
+    <section class="panel">
+      <h2>Crew</h2>
+      <div id="crew"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Heist</h2>
+
+      <div>
+        <p id="target-name"></p>
+        <p id="target-stats"></p>
       </div>
-    </header>
 
-    <main class="grid">
+      <button id="run-heist">Run Heist</button>
+    </section>
 
-      <section class="panel">
-        <h2>HQ</h2>
-        <p id="hq-level">HQ Level: 1</p>
-        <button id="upgrade-hq">Upgrade HQ</button>
-      </section>
+    <section class="panel">
+      <h2>Log</h2>
+      <div id="log"></div>
+    </section>
 
-      <section class="panel">
-        <h2>Crew</h2>
-        <div id="crew"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Heist</h2>
-
-        <div id="target">
-          <p id="target-name"></p>
-          <p id="target-stats"></p>
-        </div>
-
-        <button id="run-heist">Run Heist</button>
-      </section>
-
-      <section class="panel">
-        <h2>Log</h2>
-        <div id="log"></div>
-      </section>
-
-    </main>
-  </div>
-
-  <script src="game.js"></script>
+  </main>
 </body>
 </html>

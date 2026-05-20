@@ -1,17 +1,12 @@
-// ----------------------------
-// STATE
-// ----------------------------
 const state = {
   cash: 0,
   heat: 0,
   hqLevel: 1,
-
   crew: [
     { name: "Vex", skill: 55, morale: 80 },
     { name: "Rook", skill: 40, morale: 65 },
     { name: "Nyx", skill: 70, morale: 50 }
   ],
-
   target: {
     name: "Convenience Store",
     security: 10,
@@ -19,41 +14,74 @@ const state = {
   }
 };
 
-// ----------------------------
-// DOM
-// ----------------------------
-const cashEl = document.getElementById("cash");
-const heatEl = document.getElementById("heat");
-const crewListEl = document.getElementById("crew-list");
-const logBox = document.getElementById("log-box");
+const el = {};
 
-// ----------------------------
-// LOGGING
-// ----------------------------
-function log(msg) {
-  const div = document.createElement("div");
-  div.textContent = `> ${msg}`;
-  logBox.prepend(div);
+// --------------------
+// SAFE INIT (NEVER FAILS)
+// --------------------
+document.addEventListener("DOMContentLoaded", () => {
+  bind();
+  render();
+  log("Game started.");
+});
+
+function bind() {
+  const ids = [
+    "cash", "heat", "hq-level",
+    "crew", "log",
+    "target-name", "target-stats",
+    "run-heist", "upgrade-hq"
+  ];
+
+  ids.forEach(id => {
+    el[id] = document.getElementById(id);
+  });
+
+  // HARD GUARANTEE: buttons always bind or error is visible
+  if (!el["run-heist"] || !el["upgrade-hq"]) {
+    console.error("Critical buttons missing from DOM");
+    return;
+  }
+
+  el["run-heist"].addEventListener("click", runHeist);
+  el["upgrade-hq"].addEventListener("click", upgradeHQ);
 }
 
-// ----------------------------
-// RENDER
-// ----------------------------
-function render() {
-  cashEl.textContent = `Cash: $${state.cash}`;
-  heatEl.textContent = `Heat: ${state.heat}`;
+// --------------------
+// LOG
+// --------------------
+function log(msg) {
+  if (!el.log) return;
+  const div = document.createElement("div");
+  div.textContent = `> ${msg}`;
+  el.log.prepend(div);
+}
 
-  crewListEl.innerHTML = "";
+// --------------------
+// RENDER
+// --------------------
+function render() {
+  if (!el.cash) return;
+
+  el.cash.textContent = `Cash: $${Math.floor(state.cash)}`;
+  el.heat.textContent = `Heat: ${state.heat}`;
+  el["hq-level"].textContent = `HQ Level: ${state.hqLevel}`;
+
+  el["target-name"].textContent = `Target: ${state.target.name}`;
+  el["target-stats"].textContent =
+    `Security: ${state.target.security} | Reward: $${state.target.reward}`;
+
+  el.crew.innerHTML = "";
   state.crew.forEach(c => {
-    const el = document.createElement("div");
-    el.textContent = `${c.name} | Skill: ${c.skill} | Morale: ${c.morale}`;
-    crewListEl.appendChild(el);
+    const d = document.createElement("div");
+    d.textContent = `${c.name} | Skill ${c.skill} | Morale ${c.morale}`;
+    el.crew.appendChild(d);
   });
 }
 
-// ----------------------------
-// HEIST SIMULATION
-// ----------------------------
+// --------------------
+// GAME LOGIC
+// --------------------
 function runHeist() {
   const avgSkill =
     state.crew.reduce((a, c) => a + c.skill, 0) / state.crew.length;
@@ -61,62 +89,45 @@ function runHeist() {
   const avgMorale =
     state.crew.reduce((a, c) => a + c.morale, 0) / state.crew.length;
 
-  const successChance =
-    avgSkill - state.target.security + (avgMorale * 0.1) - state.heat * 0.5;
+  const chance =
+    avgSkill -
+    state.target.security +
+    avgMorale * 0.1 -
+    state.heat * 0.5;
 
   const roll = Math.random() * 100;
 
-  log(`Running heist on ${state.target.name}...`);
-  log(`Success chance: ${successChance.toFixed(1)}% | Roll: ${roll.toFixed(1)}`);
+  log(`Heist chance ${chance.toFixed(1)}% roll ${roll.toFixed(1)}`);
 
-  if (roll < successChance) {
+  if (roll < chance) {
     state.cash += state.target.reward;
     state.heat += 2;
-
-    log(`SUCCESS! Gained $${state.target.reward}`);
-  } else if (roll < successChance + 20) {
-    const partial = Math.floor(state.target.reward * 0.4);
-    state.cash += partial;
+    log("SUCCESS");
+  } else if (roll < chance + 20) {
+    state.cash += state.target.reward * 0.4;
     state.heat += 3;
-
-    log(`PARTIAL SUCCESS. Gained $${partial}`);
+    log("PARTIAL");
   } else {
     state.heat += 5;
-
-    log(`FAILURE. Crew escaped but heat increased.`);
+    log("FAILED");
   }
 
   render();
 }
 
-// ----------------------------
-// HQ UPGRADE (placeholder system)
-// ----------------------------
 function upgradeHQ() {
   const cost = state.hqLevel * 100;
 
   if (state.cash < cost) {
-    log(`Not enough cash for HQ upgrade.`);
+    log("Not enough cash");
     return;
   }
 
   state.cash -= cost;
-  state.hqLevel += 1;
+  state.hqLevel++;
 
   state.crew.forEach(c => c.skill += 2);
 
-  log(`HQ upgraded to level ${state.hqLevel}`);
+  log(`HQ upgraded to ${state.hqLevel}`);
   render();
 }
-
-// ----------------------------
-// EVENTS
-// ----------------------------
-document.getElementById("run-heist").onclick = runHeist;
-document.getElementById("upgrade-btn").onclick = upgradeHQ;
-
-// ----------------------------
-// INIT
-// ----------------------------
-render();
-log("Idle Heist Empire initialized.");
