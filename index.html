@@ -6,52 +6,48 @@
   <title>Idle Heist Empire</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
-<body>
 
+<body>
   <div id="app">
 
     <header class="topbar">
       <h1>Idle Heist Empire</h1>
-      <div id="heat">Heat: 0</div>
-      <div id="cash">Cash: $0</div>
+      <div id="stats">
+        <span id="cash">Cash: $0</span>
+        <span id="heat">Heat: 0</span>
+      </div>
     </header>
 
     <main class="grid">
 
-      <!-- HQ PANEL -->
-      <section class="panel" id="hq">
-        <h2>HQ Control</h2>
-        <button id="upgrade-btn">Upgrade HQ (+$100 cost placeholder)</button>
+      <section class="panel">
+        <h2>HQ</h2>
         <p id="hq-level">HQ Level: 1</p>
+        <button id="upgrade-hq">Upgrade HQ</button>
       </section>
 
-      <!-- CREW PANEL -->
-      <section class="panel" id="crew">
+      <section class="panel">
         <h2>Crew</h2>
-        <div id="crew-list"></div>
+        <div id="crew"></div>
       </section>
 
-      <!-- TARGET PANEL -->
-      <section class="panel" id="heist">
-        <h2>Heist Target</h2>
+      <section class="panel">
+        <h2>Heist</h2>
 
-        <div id="target-box">
-          <p><b>Target:</b> Convenience Store</p>
-          <p><b>Security:</b> 10</p>
-          <p><b>Reward:</b> $150</p>
+        <div id="target">
+          <p id="target-name"></p>
+          <p id="target-stats"></p>
         </div>
 
         <button id="run-heist">Run Heist</button>
       </section>
 
-      <!-- LOG PANEL -->
-      <section class="panel" id="log">
-        <h2>Event Log</h2>
-        <div id="log-box"></div>
+      <section class="panel">
+        <h2>Log</h2>
+        <div id="log"></div>
       </section>
 
     </main>
-
   </div>
 
   <script src="game.js"></script>
