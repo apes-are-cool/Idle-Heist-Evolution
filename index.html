@@ -4,48 +4,234 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Idle Heist Empire</title>
+
   <link rel="stylesheet" href="style.css"/>
-  <script src="game.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 
 <body>
+
+  <div id="toast-container"></div>
+
   <header class="topbar">
-    <h1>Idle Heist Empire</h1>
     <div>
-      <span id="cash">Cash: $0</span>
-      <span id="heat">Heat: 0</span>
+      <h1>Idle Heist Empire</h1>
+      <p class="subtitle">
+        Build the biggest underground criminal network in the city.
+      </p>
+    </div>
+
+    <div class="topbar-stats">
+
+      <div class="stat-card">
+        <span class="stat-label">Cash</span>
+        <span id="cash" class="stat-value">$0</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Heat</span>
+        <span id="heat" class="stat-value">0%</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Income/sec</span>
+        <span id="income" class="stat-value">$0</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">XP</span>
+        <span id="xp" class="stat-value">0</span>
+      </div>
+
     </div>
   </header>
 
-  <main class="grid">
+  <main class="layout">
 
-    <section class="panel">
-      <h2>HQ</h2>
-      <p id="hq-level">HQ Level: 1</p>
-      <button id="upgrade-hq">Upgrade HQ</button>
-    </section>
+    <!-- LEFT SIDE -->
+    <section class="left-column">
 
-    <section class="panel">
-      <h2>Crew</h2>
-      <div id="crew"></div>
-    </section>
+      <!-- HQ -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>HQ</h2>
+          <span id="hq-level" class="badge">Level 1</span>
+        </div>
 
-    <section class="panel">
-      <h2>Heist</h2>
+        <div class="hq-grid">
 
-      <div>
-        <p id="target-name"></p>
-        <p id="target-stats"></p>
+          <div class="hq-box">
+            <p class="hq-title">Crew Capacity</p>
+            <p id="crew-capacity" class="hq-value">3</p>
+          </div>
+
+          <div class="hq-box">
+            <p class="hq-title">Passive Income</p>
+            <p id="passive-income" class="hq-value">$0/sec</p>
+          </div>
+
+          <div class="hq-box">
+            <p class="hq-title">Reputation</p>
+            <p id="reputation" class="hq-value">Street Nobody</p>
+          </div>
+
+          <div class="hq-box">
+            <p class="hq-title">City Control</p>
+            <p id="city-control" class="hq-value">0%</p>
+          </div>
+
+        </div>
+
+        <div class="button-row">
+          <button id="upgrade-hq" class="primary-btn">
+            Upgrade HQ
+          </button>
+
+          <button id="reduce-heat" class="danger-btn">
+            Lay Low
+          </button>
+        </div>
       </div>
 
-      <button id="run-heist">Run Heist</button>
+      <!-- CREW -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Crew</h2>
+
+          <button id="recruit-btn" class="secondary-btn">
+            Recruit
+          </button>
+        </div>
+
+        <div id="crew-list" class="crew-list"></div>
+      </div>
+
+      <!-- BLACK MARKET -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Black Market</h2>
+        </div>
+
+        <div class="market-grid">
+
+          <div class="market-item">
+            <div>
+              <h3>Inside Informant</h3>
+              <p>+8% heist success chance</p>
+            </div>
+
+            <button id="buy-informant">
+              $750
+            </button>
+          </div>
+
+          <div class="market-item">
+            <div>
+              <h3>Fake IDs</h3>
+              <p>-10 Heat immediately</p>
+            </div>
+
+            <button id="buy-fakeids">
+              $500
+            </button>
+          </div>
+
+          <div class="market-item">
+            <div>
+              <h3>Crypto Laundering</h3>
+              <p>+20% reward bonus forever</p>
+            </div>
+
+            <button id="buy-launder">
+              $1800
+            </button>
+          </div>
+
+        </div>
+      </div>
+
     </section>
 
-    <section class="panel">
-      <h2>Log</h2>
-      <div id="log"></div>
+    <!-- RIGHT SIDE -->
+    <section class="right-column">
+
+      <!-- HEISTS -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Heists</h2>
+        </div>
+
+        <div id="targets" class="targets-grid"></div>
+      </div>
+
+      <!-- ACTIVE HEIST -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Current Operation</h2>
+        </div>
+
+        <div class="operation-card">
+
+          <h3 id="target-name">
+            Downtown Bank
+          </h3>
+
+          <div class="operation-stats">
+
+            <div class="operation-stat">
+              <span>Security</span>
+              <strong id="target-security">0</strong>
+            </div>
+
+            <div class="operation-stat">
+              <span>Reward</span>
+              <strong id="target-reward">$0</strong>
+            </div>
+
+            <div class="operation-stat">
+              <span>Risk</span>
+              <strong id="target-risk">0%</strong>
+            </div>
+
+            <div class="operation-stat">
+              <span>Success</span>
+              <strong id="success-rate">0%</strong>
+            </div>
+
+          </div>
+
+          <div class="progress-wrap">
+            <div id="heist-progress" class="progress-bar"></div>
+          </div>
+
+          <button id="run-heist" class="big-heist-btn">
+            START HEIST
+          </button>
+
+        </div>
+      </div>
+
+      <!-- ACHIEVEMENTS -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Achievements</h2>
+        </div>
+
+        <div id="achievements" class="achievement-list"></div>
+      </div>
+
+      <!-- LOG -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Empire Feed</h2>
+        </div>
+
+        <div id="log" class="log"></div>
+      </div>
+
     </section>
 
   </main>
+
 </body>
 </html>
