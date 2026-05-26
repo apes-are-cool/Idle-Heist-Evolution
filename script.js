@@ -1,311 +1,395 @@
 const state = {
-  cash: 500,
+
+  /* =========================
+     CORE
+  ========================= */
+
+  cash: 2500,
+  gems: 25,
+  intel: 0,
+  influence: 0,
+
   heat: 0,
   xp: 0,
+  prestige: 0,
 
   hqLevel: 1,
-  cityControl: 0,
+  labLevel: 1,
+
+  district: 1,
+
+  totalEarned: 0,
 
   passiveIncome: 0,
-  totalEarned: 0,
 
   successBonus: 0,
   rewardMultiplier: 1,
 
+  adMultiplier: 1,
+  adBoostTime: 0,
+
   heistRunning: false,
+
+  selectedTarget: 0,
+
+  crateLuck: 1,
+
+  combo: 0,
+
+  offlineTimestamp: Date.now(),
+
+  autoHeistUnlocked: false,
 
   stats: {
     successfulHeists: 0,
     failedHeists: 0,
-    recruits: 0
+    openedCrates: 0,
+    recruits: 0,
+    critHeists: 0
   },
 
-  crew: [
+  /* =========================
+     RESEARCH
+  ========================= */
+
+  research: {
+    betterWeapons: 0,
+    stealthTech: 0,
+    cryptoAI: 0,
+    insiderNetwork: 0,
+    getawayCars: 0
+  },
+
+  /* =========================
+     CREW
+  ========================= */
+
+  crew: [],
+
+  /* =========================
+     RECRUIT RARITIES
+  ========================= */
+
+  rarities: [
+
     {
-      name: "Vex",
-      role: "Hacker",
-      skill: 68,
-      morale: 82,
-      loyalty: 74
+      name: "Common",
+      color: "#c7c7c7",
+      multiplier: 1,
+      chance: 62
     },
+
     {
-      name: "Nyx",
-      role: "Driver",
-      skill: 57,
-      morale: 71,
-      loyalty: 88
+      name: "Rare",
+      color: "#55aaff",
+      multiplier: 1.4,
+      chance: 25
     },
+
     {
-      name: "Rook",
-      role: "Enforcer",
-      skill: 61,
-      morale: 76,
-      loyalty: 67
+      name: "Epic",
+      color: "#b96dff",
+      multiplier: 2,
+      chance: 9
+    },
+
+    {
+      name: "Legendary",
+      color: "#ffb347",
+      multiplier: 3,
+      chance: 3
+    },
+
+    {
+      name: "Mythic",
+      color: "#ff4d6d",
+      multiplier: 5,
+      chance: 1
     }
   ],
 
+  /* =========================
+     TARGETS
+  ========================= */
+
   targets: [
+
     {
       id: 0,
-      name: "Convenience Store",
-      security: 18,
-      reward: 220,
-      risk: 8,
-      duration: 4000
+      name: "Corner Store",
+      security: 15,
+      reward: 200,
+      risk: 5,
+      duration: 3500
     },
 
     {
       id: 1,
-      name: "Luxury Jewelry Shop",
-      security: 35,
+      name: "Luxury Mall",
+      security: 32,
       reward: 850,
-      risk: 18,
-      duration: 6500
+      risk: 12,
+      duration: 6000
     },
 
     {
       id: 2,
       name: "Downtown Bank",
-      security: 55,
-      reward: 2400,
-      risk: 35,
-      duration: 9000
+      security: 48,
+      reward: 2500,
+      risk: 20,
+      duration: 8500
     },
 
     {
       id: 3,
-      name: "Casino Vault",
-      security: 72,
-      reward: 6500,
-      risk: 50,
+      name: "Crypto Exchange",
+      security: 70,
+      reward: 8500,
+      risk: 38,
       duration: 12000
     },
 
     {
       id: 4,
-      name: "Federal Reserve Transport",
-      security: 92,
-      reward: 15000,
-      risk: 70,
-      duration: 16000
+      name: "Military Convoy",
+      security: 95,
+      reward: 22000,
+      risk: 60,
+      duration: 17000
     }
+
   ],
 
-  selectedTarget: 0,
+  /* =========================
+     BUSINESSES
+  ========================= */
+
+  businesses: [
+
+    {
+      name: "Underground Casino",
+      level: 0,
+      baseIncome: 25
+    },
+
+    {
+      name: "Forgery Lab",
+      level: 0,
+      baseIncome: 75
+    },
+
+    {
+      name: "Black Market Port",
+      level: 0,
+      baseIncome: 200
+    }
+
+  ],
+
+  /* =========================
+     ACHIEVEMENTS
+  ========================= */
 
   achievements: [
+
     {
-      id: "first_heist",
-      title: "First Blood",
-      description: "Complete your first successful heist.",
+      title: "First Heist",
+      reward: 500,
       unlocked: false,
       check: () => state.stats.successfulHeists >= 1
     },
 
     {
-      id: "rich",
-      title: "Money Printer",
-      description: "Reach $10,000 cash.",
-      unlocked: false,
-      check: () => state.cash >= 10000
-    },
-
-    {
-      id: "crew",
-      title: "Gang Leader",
-      description: "Recruit 5 crew members.",
-      unlocked: false,
-      check: () => state.crew.length >= 5
-    },
-
-    {
-      id: "empire",
-      title: "Empire Builder",
-      description: "Upgrade HQ to Level 5.",
+      title: "Big Boss",
+      reward: 2000,
       unlocked: false,
       check: () => state.hqLevel >= 5
+    },
+
+    {
+      title: "Millionaire",
+      reward: 10,
+      gemReward: true,
+      unlocked: false,
+      check: () => state.totalEarned >= 1000000
     }
+
   ]
 };
 
 const el = {};
 
-const CREW_NAMES = [
+const NAMES = [
   "Ghost",
-  "Cipher",
-  "Blaze",
-  "Knox",
-  "Shade",
+  "Vex",
   "Nova",
-  "Raven",
-  "Mako",
+  "Rogue",
   "Jinx",
-  "Zero"
+  "Cipher",
+  "Raven",
+  "Blaze",
+  "Zero",
+  "Nyx"
 ];
 
-const CREW_ROLES = [
+const ROLES = [
   "Hacker",
+  "Sniper",
   "Driver",
   "Scout",
-  "Enforcer",
-  "Demolitions",
-  "Infiltrator"
+  "Infiltrator",
+  "Demolitions"
 ];
 
-/* ------------------------------ */
-/* INIT */
-/* ------------------------------ */
+/* =====================================
+   INIT
+===================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+
   bindElements();
-  bindButtons();
 
   loadGame();
 
+  if (state.crew.length === 0) {
+
+    starterCrew();
+  }
+
   renderAll();
 
-  startPassiveIncomeLoop();
-  startHeatLoop();
-  startRandomEventLoop();
-  startAutoSave();
+  startLoops();
 
-  log("Empire initialized.");
+  processOfflineProgress();
+
+  log("Empire online.");
 });
 
-/* ------------------------------ */
-/* ELEMENTS */
-/* ------------------------------ */
+/* =====================================
+   ELEMENTS
+===================================== */
 
 function bindElements() {
 
   const ids = [
+
     "cash",
     "heat",
     "income",
     "xp",
-    "hq-level",
-    "crew-capacity",
-    "passive-income",
-    "reputation",
-    "city-control",
+
     "crew-list",
     "targets",
-    "target-name",
-    "target-security",
-    "target-reward",
-    "target-risk",
-    "success-rate",
-    "heist-progress",
     "log",
-    "achievements",
-
-    "upgrade-hq",
-    "reduce-heat",
-    "recruit-btn",
-
-    "buy-informant",
-    "buy-fakeids",
-    "buy-launder",
 
     "run-heist"
+
   ];
 
   ids.forEach(id => {
-    el[id] = document.getElementById(id);
+
+    el[id] =
+      document.getElementById(id);
   });
 }
 
-/* ------------------------------ */
-/* BUTTONS */
-/* ------------------------------ */
+/* =====================================
+   STARTER CREW
+===================================== */
 
-function bindButtons() {
+function starterCrew() {
 
-  el["run-heist"].addEventListener("click", startHeist);
+  for (let i = 0; i < 3; i++) {
 
-  el["upgrade-hq"].addEventListener("click", upgradeHQ);
-
-  el["reduce-heat"].addEventListener("click", reduceHeat);
-
-  el["recruit-btn"].addEventListener("click", recruitCrew);
-
-  el["buy-informant"].addEventListener("click", buyInformant);
-
-  el["buy-fakeids"].addEventListener("click", buyFakeIDs);
-
-  el["buy-launder"].addEventListener("click", buyLaunder);
+    openRecruitChest(true);
+  }
 }
 
-/* ------------------------------ */
-/* RENDER */
-/* ------------------------------ */
+/* =====================================
+   RENDER
+===================================== */
 
 function renderAll() {
 
-  renderTopbar();
-  renderHQ();
+  renderCurrency();
   renderCrew();
   renderTargets();
-  renderSelectedTarget();
-  renderAchievements();
 }
 
-function renderTopbar() {
+function renderCurrency() {
 
-  el.cash.textContent =
-    "$" + format(state.cash);
+  if (el.cash) {
 
-  el.heat.textContent =
-    Math.floor(state.heat) + "%";
+    el.cash.textContent =
+      "$" + format(state.cash);
+  }
 
-  el.income.textContent =
-    "$" + format(state.passiveIncome);
+  if (el.heat) {
 
-  el.xp.textContent =
-    format(state.xp);
-}
+    el.heat.textContent =
+      Math.floor(state.heat) + "%";
+  }
 
-function renderHQ() {
+  if (el.income) {
 
-  el["hq-level"].textContent =
-    "Level " + state.hqLevel;
+    el.income.textContent =
+      "$" + format(state.passiveIncome);
+  }
 
-  el["crew-capacity"].textContent =
-    getCrewCapacity();
+  if (el.xp) {
 
-  el["passive-income"].textContent =
-    "$" + format(state.passiveIncome) + "/sec";
-
-  el["city-control"].textContent =
-    Math.floor(state.cityControl) + "%";
-
-  el["reputation"].textContent =
-    getReputation();
+    el.xp.textContent =
+      format(state.xp);
+  }
 }
 
 function renderCrew() {
+
+  if (!el["crew-list"]) {
+    return;
+  }
 
   el["crew-list"].innerHTML = "";
 
   state.crew.forEach(member => {
 
-    const div = document.createElement("div");
+    const card =
+      document.createElement("div");
 
-    div.className = "crew-card";
+    card.className = "crew-card";
 
-    div.innerHTML = `
+    card.innerHTML = `
+
       <div class="crew-top">
+
         <div>
-          <div class="crew-name">${member.name}</div>
-          <div class="crew-role">${member.role}</div>
+
+          <div class="crew-name">
+            ${member.name}
+          </div>
+
+          <div
+            class="crew-role"
+            style="color:${member.color}"
+          >
+            ${member.rarity}
+          </div>
+
         </div>
 
         <div>
           ⭐ ${member.skill}
         </div>
+
       </div>
 
       <div class="crew-stats">
+
+        <div class="mini-stat">
+          <span>Role</span>
+          <strong>${member.role}</strong>
+        </div>
 
         <div class="mini-stat">
           <span>Morale</span>
@@ -317,113 +401,164 @@ function renderCrew() {
           <strong>${member.loyalty}</strong>
         </div>
 
-        <div class="mini-stat">
-          <span>Skill</span>
-          <strong>${member.skill}</strong>
-        </div>
-
       </div>
+
     `;
 
-    el["crew-list"].appendChild(div);
+    el["crew-list"].appendChild(card);
   });
 }
 
 function renderTargets() {
 
+  if (!el.targets) {
+    return;
+  }
+
   el.targets.innerHTML = "";
 
   state.targets.forEach(target => {
 
-    const card = document.createElement("div");
+    const div =
+      document.createElement("div");
 
-    card.className =
-      "target-card" +
-      (
-        state.selectedTarget === target.id
-          ? " active"
-          : ""
-      );
+    div.className = "target-card";
 
-    card.innerHTML = `
+    div.innerHTML = `
+
       <h3>${target.name}</h3>
-
-      <div class="target-info">
-        Security: ${target.security}
-      </div>
 
       <div class="target-info">
         Reward: $${format(target.reward)}
       </div>
 
       <div class="target-info">
+        Security: ${target.security}
+      </div>
+
+      <div class="target-info">
         Risk: ${target.risk}%
       </div>
+
     `;
 
-    card.addEventListener("click", () => {
+    div.addEventListener("click", () => {
 
-      state.selectedTarget = target.id;
-
-      renderTargets();
-      renderSelectedTarget();
+      state.selectedTarget =
+        target.id;
     });
 
-    el.targets.appendChild(card);
+    el.targets.appendChild(div);
   });
 }
 
-function renderSelectedTarget() {
+/* =====================================
+   CHEST SYSTEM
+===================================== */
 
-  const target =
-    state.targets[state.selectedTarget];
+function openRecruitChest(free = false) {
 
-  el["target-name"].textContent =
-    target.name;
+  const cost = 1000;
 
-  el["target-security"].textContent =
-    target.security;
+  if (!free && state.cash < cost) {
 
-  el["target-reward"].textContent =
-    "$" + format(
-      target.reward * state.rewardMultiplier
-    );
+    log("Need more cash.");
+    return;
+  }
 
-  el["target-risk"].textContent =
-    target.risk + "%";
+  if (!free) {
 
-  el["success-rate"].textContent =
-    Math.floor(getSuccessChance(target)) + "%";
+    state.cash -= cost;
+  }
+
+  state.stats.openedCrates++;
+
+  let rarity =
+    rollRarity();
+
+  const member =
+    generateRecruit(rarity);
+
+  state.crew.push(member);
+
+  log(
+    `${rarity.name} recruit acquired: ${member.name}`
+  );
+
+  toast(
+    `${rarity.name} ${member.role}`
+  );
+
+  renderAll();
 }
 
-function renderAchievements() {
+function rollRarity() {
 
-  el.achievements.innerHTML = "";
+  const boostedLuck =
+    state.crateLuck *
+    state.adMultiplier;
 
-  state.achievements.forEach(a => {
+  let roll =
+    Math.random() * 100;
 
-    const div = document.createElement("div");
+  let adjusted =
+    roll / boostedLuck;
 
-    div.className =
-      "achievement" +
-      (
-        a.unlocked
-          ? " unlocked"
-          : ""
-      );
+  let cumulative = 0;
 
-    div.innerHTML = `
-      <strong>${a.title}</strong>
-      <p>${a.description}</p>
-    `;
+  for (const rarity of state.rarities) {
 
-    el.achievements.appendChild(div);
-  });
+    cumulative += rarity.chance;
+
+    if (adjusted <= cumulative) {
+
+      return rarity;
+    }
+  }
+
+  return state.rarities[0];
 }
 
-/* ------------------------------ */
-/* GAMEPLAY */
-/* ------------------------------ */
+function generateRecruit(rarity) {
+
+  const baseSkill =
+    randomInt(40, 80);
+
+  const multiplier =
+    rarity.multiplier;
+
+  return {
+
+    name:
+      NAMES[
+        randomInt(0, NAMES.length - 1)
+      ],
+
+    role:
+      ROLES[
+        randomInt(0, ROLES.length - 1)
+      ],
+
+    rarity: rarity.name,
+
+    color: rarity.color,
+
+    skill:
+      Math.floor(
+        baseSkill * multiplier
+      ),
+
+    morale:
+      randomInt(60, 100),
+
+    loyalty:
+      randomInt(50, 100)
+  };
+}
+
+/* =====================================
+   HEISTS
+===================================== */
 
 function startHeist() {
 
@@ -436,27 +571,13 @@ function startHeist() {
 
   state.heistRunning = true;
 
-  let progress = 0;
+  log(`Started ${target.name}`);
 
-  el["heist-progress"].style.width = "0%";
+  setTimeout(() => {
 
-  log(`Crew deployed to ${target.name}.`);
+    finishHeist(target);
 
-  const interval = setInterval(() => {
-
-    progress += 100 / (target.duration / 100);
-
-    el["heist-progress"].style.width =
-      progress + "%";
-
-    if (progress >= 100) {
-
-      clearInterval(interval);
-
-      finishHeist(target);
-    }
-
-  }, 100);
+  }, target.duration);
 }
 
 function finishHeist(target) {
@@ -469,501 +590,456 @@ function finishHeist(target) {
   const roll =
     Math.random() * 100;
 
+  const critChance =
+    8 + state.research.cryptoAI * 2;
+
+  const crit =
+    Math.random() * 100 < critChance;
+
   if (roll <= chance) {
 
-    const payout =
-      Math.floor(
-        target.reward *
-        state.rewardMultiplier *
-        randomRange(0.9, 1.25)
-      );
+    let payout =
+      target.reward *
+      state.rewardMultiplier;
+
+    if (crit) {
+
+      payout *= 2.5;
+
+      state.stats.critHeists++;
+
+      log("CRITICAL HEIST!");
+    }
+
+    payout *=
+      1 + state.combo * 0.05;
+
+    payout =
+      Math.floor(payout);
 
     state.cash += payout;
 
     state.totalEarned += payout;
 
-    state.xp += Math.floor(payout / 4);
+    state.xp +=
+      Math.floor(payout / 3);
 
-    state.cityControl += 1.5;
+    state.combo++;
 
     state.heat += target.risk;
 
     state.stats.successfulHeists++;
 
-    boostCrewMorale(3);
+    if (Math.random() < 0.12) {
 
-    log(`SUCCESS: ${target.name} earned $${format(payout)}.`);
+      state.gems += 1;
 
-    toast(`+$${format(payout)}`);
+      toast("+1 Gem");
+    }
+
+    if (Math.random() < 0.08) {
+
+      state.intel += 1;
+    }
+
+    if (Math.random() < 0.03) {
+
+      state.influence += 1;
+    }
+
+    log(
+      `SUCCESS +$${format(payout)}`
+    );
+
+    toast(
+      `+$${format(payout)}`
+    );
 
   } else {
 
-    state.heat += target.risk * 1.5;
+    state.combo = 0;
+
+    state.heat +=
+      target.risk * 1.5;
 
     state.stats.failedHeists++;
 
-    lowerCrewMorale(5);
-
-    log(`FAILED: ${target.name} collapsed.`);
-
-    toast("Heist Failed");
+    log("Heist failed.");
   }
-
-  checkAchievements();
 
   scaleGame();
 
+  checkAchievements();
+
   renderAll();
 }
+
+/* =====================================
+   SUCCESS FORMULA
+===================================== */
 
 function getSuccessChance(target) {
 
+  if (state.crew.length === 0) {
+    return 5;
+  }
+
   const avgSkill =
-    average(state.crew.map(c => c.skill));
-
-  const avgMorale =
-    average(state.crew.map(c => c.morale));
-
-  const avgLoyalty =
-    average(state.crew.map(c => c.loyalty));
+    average(
+      state.crew.map(c => c.skill)
+    );
 
   let chance =
+
     avgSkill
-    + avgMorale * 0.2
-    + avgLoyalty * 0.15
-    + state.successBonus
+
     + state.hqLevel * 2
+
+    + state.labLevel * 1.5
+
+    + state.successBonus
+
+    + state.research.stealthTech * 3
+
     - target.security
-    - state.heat * 0.45;
 
-  chance =
-    clamp(chance, 5, 95);
+    - state.heat * 0.4;
 
-  return chance;
+  return clamp(chance, 5, 95);
 }
 
-/* ------------------------------ */
-/* HQ */
-/* ------------------------------ */
+/* =====================================
+   RESEARCH LAB
+===================================== */
 
-function upgradeHQ() {
+function buyResearch(type) {
 
   const cost =
-    state.hqLevel * 1200;
+    (
+      state.research[type] + 1
+    ) * 5;
 
-  if (state.cash < cost) {
+  if (state.intel < cost) {
 
-    log("Not enough cash for HQ upgrade.");
+    log("Not enough intel.");
     return;
   }
 
-  state.cash -= cost;
+  state.intel -= cost;
 
-  state.hqLevel++;
+  state.research[type]++;
 
-  state.passiveIncome +=
-    15 * state.hqLevel;
-
-  state.crew.forEach(c => {
-    c.skill += 2;
-    c.loyalty += 1;
-  });
-
-  log(`HQ upgraded to Level ${state.hqLevel}.`);
-
-  toast("HQ Upgraded");
-
-  checkAchievements();
-
-  renderAll();
+  log(
+    `${type} upgraded.`
+  );
 }
 
-function reduceHeat() {
+/* =====================================
+   BUSINESSES
+===================================== */
 
-  const cost = 400;
+function upgradeBusiness(index) {
 
-  if (state.cash < cost) {
-
-    log("Need more cash to lay low.");
-    return;
-  }
-
-  state.cash -= cost;
-
-  state.heat =
-    Math.max(0, state.heat - 25);
-
-  log("The crew disappeared for a while.");
-
-  renderAll();
-}
-
-function getCrewCapacity() {
-
-  return 3 + state.hqLevel * 2;
-}
-
-/* ------------------------------ */
-/* CREW */
-/* ------------------------------ */
-
-function recruitCrew() {
-
-  if (state.crew.length >= getCrewCapacity()) {
-
-    log("HQ capacity reached.");
-    return;
-  }
+  const business =
+    state.businesses[index];
 
   const cost =
-    500 + state.crew.length * 350;
+    (
+      business.level + 1
+    ) * 1200;
 
   if (state.cash < cost) {
 
-    log("Not enough cash to recruit.");
     return;
   }
 
   state.cash -= cost;
 
-  const member = {
+  business.level++;
 
-    name:
-      CREW_NAMES[
-        randomInt(0, CREW_NAMES.length - 1)
-      ],
-
-    role:
-      CREW_ROLES[
-        randomInt(0, CREW_ROLES.length - 1)
-      ],
-
-    skill:
-      randomInt(40, 85),
-
-    morale:
-      randomInt(50, 100),
-
-    loyalty:
-      randomInt(45, 100)
-  };
-
-  state.crew.push(member);
-
-  state.stats.recruits++;
-
-  log(`${member.name} joined the empire.`);
-
-  toast("New Recruit");
-
-  checkAchievements();
+  recalculatePassiveIncome();
 
   renderAll();
 }
 
-function boostCrewMorale(amount) {
+function recalculatePassiveIncome() {
 
-  state.crew.forEach(c => {
-    c.morale =
-      clamp(c.morale + amount, 0, 100);
-  });
-}
+  let total = 0;
 
-function lowerCrewMorale(amount) {
+  state.businesses.forEach(b => {
 
-  state.crew.forEach(c => {
-    c.morale =
-      clamp(c.morale - amount, 0, 100);
-  });
-}
-
-/* ------------------------------ */
-/* MARKET */
-/* ------------------------------ */
-
-function buyInformant() {
-
-  const cost = 750;
-
-  if (state.cash < cost) {
-    return log("Not enough cash.");
-  }
-
-  state.cash -= cost;
-
-  state.successBonus += 8;
-
-  log("Inside informant acquired.");
-
-  renderAll();
-}
-
-function buyFakeIDs() {
-
-  const cost = 500;
-
-  if (state.cash < cost) {
-    return log("Not enough cash.");
-  }
-
-  state.cash -= cost;
-
-  state.heat =
-    Math.max(0, state.heat - 10);
-
-  log("Fake IDs distributed.");
-
-  renderAll();
-}
-
-function buyLaunder() {
-
-  const cost = 1800;
-
-  if (state.cash < cost) {
-    return log("Not enough cash.");
-  }
-
-  state.cash -= cost;
-
-  state.rewardMultiplier += 0.2;
-
-  log("Crypto laundering online.");
-
-  renderAll();
-}
-
-/* ------------------------------ */
-/* PASSIVE */
-/* ------------------------------ */
-
-function startPassiveIncomeLoop() {
-
-  setInterval(() => {
-
-    state.cash +=
-      state.passiveIncome / 2;
-
-    state.totalEarned +=
-      state.passiveIncome / 2;
-
-    renderTopbar();
-
-  }, 500);
-}
-
-function startHeatLoop() {
-
-  setInterval(() => {
-
-    if (state.heat > 0) {
-      state.heat -= 0.35;
-    }
-
-    state.heat =
-      clamp(state.heat, 0, 100);
-
-    renderTopbar();
-
-  }, 1000);
-}
-
-/* ------------------------------ */
-/* RANDOM EVENTS */
-/* ------------------------------ */
-
-function startRandomEventLoop() {
-
-  setInterval(() => {
-
-    const roll =
-      Math.random();
-
-    if (roll < 0.25) {
-
-      const bonus =
-        randomInt(200, 1200);
-
-      state.cash += bonus;
-
-      log(`Anonymous tip earned $${bonus}.`);
-
-      toast(`+$${bonus}`);
-
-    } else if (roll < 0.45) {
-
-      state.heat += 8;
-
-      log("Police crackdown increased heat.");
-
-      toast("Heat Rising");
-
-    } else if (roll < 0.60) {
-
-      boostCrewMorale(10);
-
-      log("Crew party boosted morale.");
-
-    }
-
-    renderAll();
-
-  }, 30000);
-}
-
-/* ------------------------------ */
-/* ACHIEVEMENTS */
-/* ------------------------------ */
-
-function checkAchievements() {
-
-  state.achievements.forEach(a => {
-
-    if (!a.unlocked && a.check()) {
-
-      a.unlocked = true;
-
-      state.cash += 1000;
-
-      log(`Achievement unlocked: ${a.title}`);
-
-      toast(a.title);
-    }
+    total +=
+      b.level *
+      b.baseIncome;
   });
 
-  renderAchievements();
+  total *=
+    1 + state.prestige * 0.15;
+
+  total *=
+    1 + state.research.cryptoAI * 0.08;
+
+  state.passiveIncome =
+    Math.floor(total);
 }
 
-/* ------------------------------ */
-/* SCALE */
-/* ------------------------------ */
+/* =====================================
+   ADS
+===================================== */
+
+function watchAdForCash() {
+
+  const reward =
+    5000 *
+    (
+      1 + state.prestige
+    );
+
+  state.cash += reward;
+
+  log(
+    `Ad payout: $${format(reward)}`
+  );
+
+  toast(
+    `+$${format(reward)}`
+  );
+}
+
+function watchAdForLuck(multiplier) {
+
+  state.adMultiplier =
+    multiplier;
+
+  state.adBoostTime =
+    300;
+
+  log(
+    `${multiplier}x recruit luck active`
+  );
+}
+
+/* =====================================
+   PRESTIGE
+===================================== */
+
+function prestigeReset() {
+
+  if (state.totalEarned < 500000) {
+
+    log("Need more empire value.");
+    return;
+  }
+
+  const reward =
+    Math.floor(
+      state.totalEarned / 500000
+    );
+
+  state.prestige += reward;
+
+  state.cash = 2500;
+
+  state.heat = 0;
+
+  state.totalEarned = 0;
+
+  state.hqLevel = 1;
+
+  state.labLevel = 1;
+
+  state.passiveIncome = 0;
+
+  state.crew = [];
+
+  state.businesses.forEach(b => {
+
+    b.level = 0;
+  });
+
+  starterCrew();
+
+  log(
+    `Prestiged for ${reward} prestige.`
+  );
+
+  renderAll();
+}
+
+/* =====================================
+   SCALE
+===================================== */
 
 function scaleGame() {
 
   state.targets.forEach(target => {
 
-    target.reward =
-      Math.floor(target.reward * 1.02);
+    target.reward *= 1.025;
 
-    target.security += 0.3;
+    target.security += 0.5;
+
+    target.risk += 0.08;
   });
 }
 
-/* ------------------------------ */
-/* UTIL */
-/* ------------------------------ */
+/* =====================================
+   ACHIEVEMENTS
+===================================== */
 
-function average(arr) {
+function checkAchievements() {
 
-  return (
-    arr.reduce((a, b) => a + b, 0)
-    / arr.length
+  state.achievements.forEach(a => {
+
+    if (
+      !a.unlocked &&
+      a.check()
+    ) {
+
+      a.unlocked = true;
+
+      if (a.gemReward) {
+
+        state.gems += a.reward;
+
+      } else {
+
+        state.cash += a.reward;
+      }
+
+      toast(a.title);
+
+      log(
+        `Achievement unlocked: ${a.title}`
+      );
+    }
+  });
+}
+
+/* =====================================
+   LOOPS
+===================================== */
+
+function startLoops() {
+
+  setInterval(gameTick, 1000);
+
+  setInterval(autoSave, 5000);
+
+  setInterval(randomEvents, 25000);
+
+  setInterval(adTimerTick, 1000);
+}
+
+function gameTick() {
+
+  state.cash += state.passiveIncome;
+
+  state.totalEarned +=
+    state.passiveIncome;
+
+  if (state.heat > 0) {
+
+    state.heat -= 0.5;
+  }
+
+  state.heat =
+    clamp(state.heat, 0, 100);
+
+  renderCurrency();
+}
+
+function adTimerTick() {
+
+  if (state.adBoostTime <= 0) {
+
+    state.adMultiplier = 1;
+
+    return;
+  }
+
+  state.adBoostTime--;
+}
+
+function randomEvents() {
+
+  const roll =
+    Math.random();
+
+  if (roll < 0.25) {
+
+    const cash =
+      randomInt(2000, 12000);
+
+    state.cash += cash;
+
+    log(
+      `Black market payout: $${cash}`
+    );
+
+  } else if (roll < 0.45) {
+
+    state.heat += 12;
+
+    log("Police raid wave.");
+
+  } else if (roll < 0.60) {
+
+    state.gems += 1;
+
+    toast("+1 Gem");
+
+  } else if (roll < 0.70) {
+
+    openRecruitChest(true);
+  }
+
+  renderAll();
+}
+
+/* =====================================
+   OFFLINE PROGRESS
+===================================== */
+
+function processOfflineProgress() {
+
+  const now = Date.now();
+
+  const diff =
+    Math.floor(
+      (
+        now -
+        state.offlineTimestamp
+      ) / 1000
+    );
+
+  if (diff <= 5) {
+    return;
+  }
+
+  const earnings =
+    diff *
+    state.passiveIncome;
+
+  state.cash += earnings;
+
+  toast(
+    `Offline Earnings: $${format(earnings)}`
   );
+
+  renderAll();
 }
 
-function clamp(value, min, max) {
+/* =====================================
+   SAVE
+===================================== */
 
-  return Math.max(
-    min,
-    Math.min(max, value)
-  );
-}
+function autoSave() {
 
-function randomInt(min, max) {
-
-  return Math.floor(
-    Math.random() * (max - min + 1)
-  ) + min;
-}
-
-function randomRange(min, max) {
-
-  return Math.random() * (max - min) + min;
-}
-
-function format(num) {
-
-  return Math.floor(num)
-    .toLocaleString();
-}
-
-function getReputation() {
-
-  if (state.totalEarned >= 1000000) {
-    return "Shadow King";
-  }
-
-  if (state.totalEarned >= 250000) {
-    return "Crime Syndicate";
-  }
-
-  if (state.totalEarned >= 50000) {
-    return "Mastermind";
-  }
-
-  if (state.totalEarned >= 10000) {
-    return "Kingpin";
-  }
-
-  if (state.totalEarned >= 3000) {
-    return "Professional Crew";
-  }
-
-  return "Street Nobody";
-}
-
-/* ------------------------------ */
-/* LOG */
-/* ------------------------------ */
-
-function log(message) {
-
-  const div =
-    document.createElement("div");
-
-  div.className = "log-entry";
-
-  div.textContent =
-    `[${new Date().toLocaleTimeString()}] ${message}`;
-
-  el.log.prepend(div);
-
-  while (el.log.children.length > 40) {
-    el.log.removeChild(el.log.lastChild);
-  }
-}
-
-/* ------------------------------ */
-/* TOAST */
-/* ------------------------------ */
-
-function toast(message) {
-
-  const container =
-    document.getElementById("toast-container");
-
-  const div =
-    document.createElement("div");
-
-  div.className = "toast";
-
-  div.textContent = message;
-
-  container.appendChild(div);
-
-  setTimeout(() => {
-    div.remove();
-  }, 2500);
-}
-
-/* ------------------------------ */
-/* SAVE */
-/* ------------------------------ */
-
-function saveGame() {
+  state.offlineTimestamp =
+    Date.now();
 
   localStorage.setItem(
-    "idleHeistEmpireSave",
+    "idleHeistEmpireSaveV2",
     JSON.stringify(state)
   );
 }
@@ -972,7 +1048,7 @@ function loadGame() {
 
   const save =
     localStorage.getItem(
-      "idleHeistEmpireSave"
+      "idleHeistEmpireSaveV2"
     );
 
   if (!save) {
@@ -992,11 +1068,107 @@ function loadGame() {
   }
 }
 
-function startAutoSave() {
+/* =====================================
+   UTIL
+===================================== */
 
-  setInterval(() => {
+function average(arr) {
 
-    saveGame();
+  return (
+    arr.reduce((a, b) => a + b, 0)
+    / arr.length
+  );
+}
 
-  }, 5000);
+function clamp(v, min, max) {
+
+  return Math.max(
+    min,
+    Math.min(max, v)
+  );
+}
+
+function randomInt(min, max) {
+
+  return Math.floor(
+    Math.random() *
+    (max - min + 1)
+  ) + min;
+}
+
+function format(num) {
+
+  return Math.floor(num)
+    .toLocaleString();
+}
+
+/* =====================================
+   LOG
+===================================== */
+
+function log(msg) {
+
+  if (!el.log) {
+    return;
+  }
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    "log-entry";
+
+  div.textContent =
+    `[${new Date().toLocaleTimeString()}] ${msg}`;
+
+  el.log.prepend(div);
+
+  while (
+    el.log.children.length > 40
+  ) {
+
+    el.log.removeChild(
+      el.log.lastChild
+    );
+  }
+}
+
+/* =====================================
+   TOAST
+===================================== */
+
+function toast(text) {
+
+  let container =
+    document.getElementById(
+      "toast-container"
+    );
+
+  if (!container) {
+
+    container =
+      document.createElement("div");
+
+    container.id =
+      "toast-container";
+
+    document.body.appendChild(
+      container
+    );
+  }
+
+  const div =
+    document.createElement("div");
+
+  div.className = "toast";
+
+  div.textContent = text;
+
+  container.appendChild(div);
+
+  setTimeout(() => {
+
+    div.remove();
+
+  }, 3000);
 }
